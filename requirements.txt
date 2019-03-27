@@ -1,0 +1,12 @@
+pytesseract
+matplotlib
+torch
+torchvision
+tensorflow
+keras
+lmdb
+flask
+flask-cors
+flask-httpauth
+flask-sqlalchemy
+scikit-image
