@@ -98,6 +98,11 @@ with graph.as_default():
     correct_prediction = tf.equal(tf.cast(predicted_labels, tf.int32), labels_placeholder)
     acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+    loss_summary = tf.summary.scalar('loss', mean_loss)
+    acc_summary = tf.summary.scalar('loss', acc)
+
+    summary_op = tf.summary.merge_all()
+
     # init = tf.initialize_all_variables()
 
 
@@ -134,8 +139,11 @@ with tf.Session(
     # 用于保存和载入模型#要放在session里面才可以
     saver = tf.train.Saver()
     saver.restore(sess, model_path)
+    summary_writer = tf.summary.FileWriter(model_path, graph=sess.graph)
+
     n_epoch = 1
-    batch_size = 252
+    batch_size = 128
+    current_step = 0
 
     # sess.run(init)
     for epoch in range(n_epoch):
@@ -143,12 +151,11 @@ with tf.Session(
         # validation
         val_loss, val_acc, n_batch = 0, 0, 0
         for x_val_a, y_val_a in minibatches(datas, labels, batch_size, shuffle=False):
-            err, ac = sess.run([mean_loss, acc], feed_dict={datas_placeholder: x_val_a, labels_placeholder: y_val_a,dropout_placeholdr: 0})
-            val_loss += err;
-            val_acc += ac;
-            n_batch += 1
-        print("   validation loss: %f" % (val_loss / n_batch))
-        print("   validation acc: %f" % (val_acc / n_batch))
+            if current_step%10==0:
+                err, ac ,summary= sess.run([mean_loss, acc,summary_op], feed_dict={datas_placeholder: x_val_a, labels_placeholder: y_val_a,dropout_placeholdr: 0})
+                summary_writer.add_summary(summary, current_step)
+                print("----- Step %d -- Loss %.5f -- acc %.5f" % (current_step, err, ac))
+            current_step=current_step+1
 '''
    validation loss: 3.135902
    validation acc: 0.914683

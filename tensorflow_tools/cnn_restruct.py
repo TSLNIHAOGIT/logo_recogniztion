@@ -93,12 +93,18 @@ with graph.as_default():
     mean_loss = tf.reduce_mean(losses)
 
     # 定义优化器，指定要优化的损失函数
-    optimizer = tf.train.AdamOptimizer(learning_rate=1e-2).minimize(losses)
+    step = tf.Variable(0, trainable=False)
+    optimizer = tf.train.AdamOptimizer(learning_rate=1e-2).minimize(losses,global_step=step)
 
     correct_prediction = tf.equal(tf.cast(predicted_labels, tf.int32), labels_placeholder)
     acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
     init = tf.initialize_all_variables()
+
+    loss_summary = tf.summary.scalar('loss', mean_loss)
+    acc_summary = tf.summary.scalar('loss', acc)
+
+    summary_op = tf.summary.merge_all()
 
 
 
@@ -121,9 +127,11 @@ with tf.Session(
         config=tf.ConfigProto(log_device_placement=True,allow_soft_placement=True),
         graph=graph) as sess:
     # 用于保存和载入模型#要放在session里面才可以
-    saver = tf.train.Saver()
+    saver = tf.train.Saver(max_to_keep=5)
 
-    n_epoch = 100
+    summary_writer = tf.summary.FileWriter(model_path, graph=sess.graph)
+
+    n_epoch = 10
     batch_size = 64
 
     sess.run(init)
@@ -133,14 +141,25 @@ with tf.Session(
         # training
         train_loss, train_acc, n_batch = 0, 0, 0
         for x_train_a, y_train_a in minibatches(datas, labels, batch_size, shuffle=True):
-            _, err, ac = sess.run([optimizer, mean_loss,acc], feed_dict={datas_placeholder: x_train_a, labels_placeholder: y_train_a,dropout_placeholdr: 0.25})
-            train_loss += err;
-            train_acc += ac;
-            n_batch += 1
-        print("   train loss: %f" % (train_loss / n_batch))
-        print("   train acc: %f" % (train_acc / n_batch))
-    saver.save(sess, model_path)
-    print("训练结束，保存模型到{}".format(model_path))
+            feed_dict = {datas_placeholder: x_train_a, labels_placeholder: y_train_a, dropout_placeholdr: 0.25}
+            _, current_step = sess.run([optimizer, step],feed_dict=feed_dict)
+
+            # 每隔几个batch输出一次测评
+            if current_step % 10 == 0:
+
+                _, err, ac,summary = sess.run([optimizer, mean_loss,acc,summary_op],feed_dict=feed_dict )
+                summary_writer.add_summary(summary, current_step)
+
+                # train_loss += err;
+                # train_acc += ac;
+                # n_batch += 1
+                saver.save(sess, model_path, global_step=current_step)
+                print("----- Step %d -- Loss %.5f -- acc %.5f" % (current_step, err, ac))
+
+        # print("   train loss: %f" % (train_loss / n_batch))
+        # print("   train acc: %f" % (train_acc / n_batch))
+
+
 
 
 
