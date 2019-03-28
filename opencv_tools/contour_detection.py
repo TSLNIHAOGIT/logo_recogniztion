@@ -1,6 +1,6 @@
 import cv2
 
-img = cv2.imread('counter_test2.png')
+img = cv2.imread('counter_test.png')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 ret,binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
@@ -19,14 +19,14 @@ print ("contours 数量：",len(contours))
 print ("contours[0]点的个数：",len(contours[0]))
 print ("contours[1]点的个数：",len(contours[1]))
 
-# cv2.imshow("img", img)
-# cv2.imshow("draw_img0", draw_img0)
-# cv2.imshow("draw_img1", draw_img1)
-# cv2.imshow("draw_img2", draw_img2)
-# cv2.imshow("draw_img3", draw_img3)
-#
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+cv2.imshow("img", img)
+cv2.imshow("draw_img0", draw_img0)
+cv2.imshow("draw_img1", draw_img1)
+cv2.imshow("draw_img2", draw_img2)
+cv2.imshow("draw_img3", draw_img3)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
 """
 x, y, w, h = cv2.boundingRect(img)   
@@ -47,6 +47,10 @@ for i in range(0,len(contours)):
     x, y, w, h = cv2.boundingRect(contours[i])
     cv2.rectangle(img, (x,y), (x+w,y+h), (153,153,0), 5)
     new_image=img[y+2:y+h-2,x+2:x+w-2]    # 先用y确定高，再用x确定宽
-    cv2.imwrite( "{}.jpg".format(i), new_image)
+    # cv2.imwrite( "{}.jpg".format(i), new_image)
+    # cv2.imshow("draw_img3", new_image)
+
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
 
 

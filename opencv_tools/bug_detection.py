@@ -1,18 +1,3 @@
-# import  cv2
-# #step1：加载图片，转成灰度图
-# image = cv2.imread("test.png")
-# gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-#
-# # step2:用Sobel算子计算x，y方向上的梯度，之后在x方向上减去y方向上的梯度，通过这个减法，我们留下具有高水平梯度和低垂直梯度的图像区域。
-# gradX = cv2.Sobel(gray, ddepth=cv2.CV_32F, dx=1, dy=0, ksize=-1)
-# gradY = cv2.Sobel(gray, ddepth=cv2.CV_32F, dx=0, dy=1, ksize=-1)
-#
-# # subtract the y-gradient from the x-gradient
-# gradient = cv2.subtract(gradX, gradY)
-# gradient = cv2.convertScaleAbs(gradient)
-#
-# cv2.imshow("view", gradient)
-# cv2.waitKey()
 
 # -*- coding:utf-8 -*-
 
@@ -27,7 +12,7 @@ import cv2
 import numpy as np
 
 # step1：加载图片，转成灰度图
-image = cv2.imread("test3.jpg")
+image = cv2.imread("traffic_test00.jpg")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 # step2:用Sobel算子计算x，y方向上的梯度，之后在x方向上减去y方向上的梯度，通过这个减法，我们留下具有高水平梯度和低垂直梯度的图像区域。
@@ -79,10 +64,10 @@ rect = cv2.minAreaRect(c)
 box = np.int0(cv2.boxPoints(rect))
 
 # draw a bounding box arounded the detected barcode and display the image
-cv2.drawContours(image, [box], -1, (0, 255, 0), 3)
-cv2.imshow("Image", image)
-cv2.imwrite("contoursImage2.jpg", image)
-cv2.waitKey(0)
+cv2.drawContours(image.copy(), [box], -1, (0, 255, 0), 3)
+# cv2.imshow("Image", image)
+# cv2.imwrite("contoursImage2.jpg", image)
+# cv2.waitKey(0)
 
 
 
@@ -124,10 +109,10 @@ rect = cv2.minAreaRect(c)
 # rect = cv2.minAreaRect(cnts[1])
 box = np.int0(cv2.boxPoints(rect))
 # draw a bounding box arounded the detected barcode and display the image
-cv2.drawContours(image, [box], -1, (0, 255, 0), 3)
-cv2.imshow("Image", image)
-cv2.imwrite("contoursImage2.jpg", image)
-cv2.waitKey(0)
+draw_img=cv2.drawContours(image.copy(), [box], -1, (0, 255, 0), 3)
+cv2.imshow("draw_img", draw_img)
+# cv2.imwrite("contoursImage2.jpg", image)
+# cv2.waitKey(0)
 
 # step7：裁剪。box里保存的是绿色矩形区域四个顶点的坐标。我将按下图红色矩形所示裁剪昆虫图像。
 # 找出四个顶点的x，y坐标的最大最小值。新图像的高=maxY-minY，宽=maxX-minX。
@@ -143,5 +128,5 @@ cropImg = image[y1:y1 + hight, x1:x1 + width]
 
 # show image
 cv2.imshow("cropImg", cropImg)
-cv2.imwrite("bee.jpg", cropImg)
+# cv2.imwrite("bug_.jpg", cropImg)
 cv2.waitKey()
