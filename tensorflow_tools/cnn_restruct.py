@@ -24,6 +24,7 @@ def get_data(path=None):
 # 模型文件路径
 
 model_path='cnn_model_train'
+view_save_path='cnn_model_train'
 # 从文件夹读取图片和标签到numpy数组中
 # 标签信息在文件名中，例如1_40.jpg表示该图片的标签为1
 
@@ -101,8 +102,8 @@ with graph.as_default():
     acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 
-    loss_summary = tf.summary.scalar('loss', mean_loss)
-    acc_summary = tf.summary.scalar('loss', acc)
+    loss_summary = tf.summary.scalar('loss_train', mean_loss)
+    acc_summary = tf.summary.scalar('acc_train', acc)
 
     summary_op = tf.summary.merge_all()
 
@@ -132,7 +133,7 @@ with tf.Session(
         graph=graph) as sess:
 
 
-    summary_writer = tf.summary.FileWriter(model_path, graph=sess.graph)
+    summary_writer = tf.summary.FileWriter(view_save_path, graph=sess.graph)
 
     n_epoch = 10
     batch_size = 64
