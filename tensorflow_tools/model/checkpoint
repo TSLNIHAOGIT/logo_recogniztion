@@ -1,6 +1,0 @@
-model_checkpoint_path: "image_model-780"
-all_model_checkpoint_paths: "image_model-740"
-all_model_checkpoint_paths: "image_model-750"
-all_model_checkpoint_paths: "image_model-760"
-all_model_checkpoint_paths: "image_model-770"
-all_model_checkpoint_paths: "image_model-780"

@@ -22,7 +22,7 @@ def get_data(path=None):
 
 
 # 模型文件路径
-model_path = "model/image_model"
+model_path='cnn_model_train'
 # 从文件夹读取图片和标签到numpy数组中
 # 标签信息在文件名中，例如1_40.jpg表示该图片的标签为1
 
@@ -83,6 +83,7 @@ with graph.as_default():
     logits = tf.layers.dense(dropout_fc, num_classes)
 
     predicted_labels = tf.arg_max(logits, 1)
+    saver = tf.train.Saver()
 
 
 #打乱顺序
@@ -110,8 +111,13 @@ with tf.Session(
         config=tf.ConfigProto(log_device_placement=True,allow_soft_placement=True),
         graph=graph) as sess:
     # 用于保存和载入模型#要放在session里面才可以
-    saver = tf.train.Saver()
-    saver.restore(sess, model_path)
+    ckpt = tf.train.get_checkpoint_state(model_path)
+    print('CKPT', ckpt)
+    # if ckpt and ckpt.model_checkpoint_path:
+    if ckpt and tf.train.checkpoint_exists(ckpt.model_checkpoint_path):
+        print('开始加载变量')
+        saver.restore(sess, ckpt.model_checkpoint_path)
+    # saver.restore(sess, 'model/model.ckpt-780')
     n_epoch = 1
     batch_size = 100
 

@@ -22,7 +22,8 @@ def get_data(path=None):
 
 
 # 模型文件路径
-model_path = "model/image_model"
+
+model_path='cnn_model_train'
 # 从文件夹读取图片和标签到numpy数组中
 # 标签信息在文件名中，例如1_40.jpg表示该图片的标签为1
 
@@ -99,12 +100,15 @@ with graph.as_default():
     correct_prediction = tf.equal(tf.cast(predicted_labels, tf.int32), labels_placeholder)
     acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-    init = tf.initialize_all_variables()
 
     loss_summary = tf.summary.scalar('loss', mean_loss)
     acc_summary = tf.summary.scalar('loss', acc)
 
     summary_op = tf.summary.merge_all()
+
+    init = tf.initialize_all_variables()
+    # 用于保存和载入模型#要放在session里面才可以
+    saver = tf.train.Saver(max_to_keep=5)
 
 
 
@@ -126,8 +130,7 @@ def minibatches(inputs=None, targets=None, batch_size=None, shuffle=False):
 with tf.Session(
         config=tf.ConfigProto(log_device_placement=True,allow_soft_placement=True),
         graph=graph) as sess:
-    # 用于保存和载入模型#要放在session里面才可以
-    saver = tf.train.Saver(max_to_keep=5)
+
 
     summary_writer = tf.summary.FileWriter(model_path, graph=sess.graph)
 
@@ -153,7 +156,8 @@ with tf.Session(
                 # train_loss += err;
                 # train_acc += ac;
                 # n_batch += 1
-                saver.save(sess, model_path, global_step=current_step)
+                checkpoint_path = os.path.join(model_path, 'cnn_model.ckpt')
+                saver.save(sess, checkpoint_path, global_step=current_step)
                 print("----- Step %d -- Loss %.5f -- acc %.5f" % (current_step, err, ac))
 
         # print("   train loss: %f" % (train_loss / n_batch))
